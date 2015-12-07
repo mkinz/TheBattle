@@ -1,0 +1,222 @@
+#!/usr/bin/env ruby
+##### classes and class methods
+class Character
+	
+	attr_accessor :name, :hp, :strength, :defence, :agility
+	
+	def initialize(name, hp, strength, defence, agility)
+		@name = name
+		@hp = hp
+		@strength = strength
+		@defence = defence
+		@agility = agility	
+	end
+
+	# allows a player to control the hero's attack by choosing the type of attack
+	def cqc(opponent)
+		puts "#{@name} attacks #{opponent.name}."
+		dots
+		puts "[type 'kick', 'punch', or 'toss' to attack!]"
+		print "> "
+		
+		choice = $stdin.gets.chomp
+		list_of_choices = ['kick', 'punch', 'toss']
+
+		if not list_of_choices.include?(choice)
+			puts "What? I didn't get that. 12345"
+			cqc(opponent)
+		
+		else
+
+			if opponent.agility == rand(3..5) 
+			puts "#{@name}'s attack misses!"
+			
+			elsif opponent.defence >= 3 && rand(1..5) == 2
+			puts "#{opponent.name} blocks the attack!"
+
+			else
+				case choice
+				when "kick"
+					puts "#{@name} kicks #{opponent.name}!"
+					opponent.hp -= rand(2..5)
+					opponent.defence -= rand(2)
+					opponent.agility -= 1
+					opponent.strength -= rand(1..3)
+				when 'punch'
+					puts "#{@name} punches #{opponent.name}!"
+					opponent.hp -= rand(1..4)
+					opponent.defence -= rand(2)
+					opponent.agility -= 1	
+					opponent.strength -= rand(2)				
+				when 'toss'
+					if @strength >= 3
+						puts "#{@name} tosses #{opponent.name}!"
+						opponent.hp -= rand(3..4)
+						opponent.defence -= rand(2)
+						opponent.agility -= 1
+						opponent.strength -= rand(3)
+						#player loses 1 defence 
+						@defence -= 1
+						@strength -= rand(1..2)
+					else
+						puts "#{@name} tries to toss #{opponent.name}, but isn't strong enough!"
+						@agility -= rand(1..3)
+						@defence -= rand(3)	
+					end				
+				else
+					puts "What? I didn't get that"
+					cqc(opponent)
+				end
+				puts "#{opponent.name}'s hp: #{opponent.hp}"
+			end
+		end
+	end
+
+	#  allows the computer to fight the player
+	def computer_attack(opponent)
+		puts "#{@name} attacks #{opponent.name}."
+		dots
+
+		if opponent.agility == rand(3..5) 
+			puts "#{@name}'s attack misses!"
+			
+		elsif opponent.defence >= 3 && rand(1..5) == 2
+			puts "#{opponent.name} blocks the attack!"
+
+		else
+			option = ["shoot", "grenade", "raven"]
+			options = option[rand(0..2)]
+			case options
+			when option = "shoot"
+				puts "#{@name} shoots #{opponent.name}!"
+				opponent.hp -= rand(3..5)
+				opponent.defence -= rand(3)
+				opponent.agility -= rand(4)
+				opponent.strength -= rand(1..3)
+			when option = "grenade"
+				puts "#{@name} blows up #{opponent.name} with a 'nade!"
+				opponent.hp -= rand(3..7)
+				opponent.defence -= rand(1..4)
+				opponent.agility -= rand(1..5)
+				opponent.strength -= rand(3)
+				#grenade may inflict shrapnel damage on attacker
+				@hp -= rand(0..4)
+			when option = "raven"
+				if @strength >4
+					puts "#{@name} sends out the Raven!"
+					puts "#{opponent.name}'s hp and agility are severly reduced!"
+					opponent.hp -= rand(3..strength)
+					opponent.defence -= rand(1..2)
+					opponent.agility -= rand(3..5)
+					opponent.strength -= rand(4)
+					@hp -= rand(1..3)
+					@defence -= 3
+				else
+					puts "#{@name} sends out the Raven, but isn't strong enough to control it!"
+					@hp -= rand(1..4)
+					@defence -= rand(2..3)
+				end
+
+			else
+				random_attack(opponent)
+			end
+			dots
+			puts "#{opponent.name}'s hp: #{opponent.hp}"
+		end
+	end
+end
+
+# hero subclass
+class Hero < Character
+	def stats
+		puts "Your hero's name is #{@name}, and he has #{@hp} hp, #{@strength} strength, #{@defence} defence, and #{@agility} agility."
+	end
+end
+
+# enemy subclass
+class Enemy < Character
+	def stats
+		puts "The enemy's name is #{@name}, and he has #{@hp} hp, #{@strength} strength, #{@defence} defence, and #{@agility} agility."
+	end
+end
+
+########global methods
+
+# prints out the game title
+$start = "Metal Gear Solid".upcase
+
+def opening()
+	$start.split('').each do |i|
+		print i
+		sleep(0.005)
+	end
+	puts
+end
+
+# prints out a bunch of dots to separate text
+def dots()
+	($start.length).times do |i|
+		sleep(0.005)
+		print "."
+	end
+	puts
+end
+
+def cqc_attack(opponent)
+	$hero.cqc($enemy)
+	dots()
+	sleep(0.2)
+end
+
+def random_attack(opponent)
+	$enemy.computer_attack($hero)
+	dots()
+	sleep(0.2)
+end
+
+def death(winner, loser)
+	puts
+	puts "#{winner.upcase} kills #{loser.upcase}!"
+	puts "end of the battle!".upcase
+end
+
+# main game loop
+def game_loop()
+	until $hero.hp <= 0 || $enemy.hp <= 0
+		cqc_attack($enemy)
+		if $enemy.hp > 0
+			random_attack($hero)
+		end
+	end
+	if $hero.hp <= 0
+		death($enemy.name, $hero.name)
+	else
+		death($hero.name, $enemy.name)				
+	end					
+end
+
+
+#initialize new instances of hero and enemy 
+$hero = Hero.new("Snake", rand(6..10), rand(6..9), rand(6..9), rand(5..9))
+$enemy = Enemy.new("Vulcan Raven", rand(6..10), rand(6..9), rand(5..9), rand(6..9))
+
+#######################
+# play the game!
+
+opening()
+
+dots()
+sleep(1)
+puts
+
+puts $hero.stats
+puts $enemy.stats
+
+dots()
+sleep(1)
+
+puts
+puts "what was that noise?!".upcase
+puts
+
+game_loop()
