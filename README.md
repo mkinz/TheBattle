@@ -6,4 +6,7 @@ This game is made out of respect for one of my favorite games of all time. It is
 
 This is a small turn based battle, similar to the Pokemon style battle system, where a human player and computer oponent are initialized with random stats. The human player can select one of three attacks, and the computer player will randomly select one of three possible attacks. The possible attacks and accuracy (defined as a successful attack vs. a miss) depend on the randomly-generated initialized stats, which also change as the battle progresses. Hit points are decremented, and the first player to reach <= 0 hit points loses the battle.
 
+8/29/2017
+I've been working on converting the ruby source code to python, and refactoring code whenever possible to improve the script. The current state of the program is functional, but missing many of the visual pieces of the ruby code. I will continue to improve the python script over time.
+
 
